@@ -1,0 +1,51 @@
+---
+title: "Developing Data Products Week 2 Assignment"
+author: "Bill Lisse"
+date: "May 15, 2023"
+
+output: 
+  html_document:
+    keep_md: true
+    theme: paper
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment="#/>")
+```
+
+## Introduction
+
+The goal of this assignment is to create a web page using R Markdown that features a map created with Leaflet. The webpage should be hosted on either Github Pages, RPubs, or NeoCities. The webpage must also contain the date when the document was created.
+
+## Top 50 Earthquakes
+
+The map shows a sample of 50 ocean eartquakes based on magnitude near Sydney, Australia. code repository is located at  https://github.com/Spyguy3/Data_Products_Week2_Project.git
+
+```{r}
+# Load the required packages
+library(leaflet)
+set.seed(122)
+# Sample the data for 50 observations
+quakes1=quakes[sample(nrow(quakes),50),]
+
+# create earthquake magnitude range to define the type as follows 
+quakes1$magrange = cut(quakes1$mag, 
+                      breaks = c(4, 5, 6, 7), right=FALSE,
+                      labels = c("Light[4-5)", "Moderate[5-6)", "Strong[6-7)"))
+
+# Define a color pallete corresponding to the magnitude ranges
+pal = colorFactor(palette = c("yellow", "red", "black"), domain=quakes1$magrange)
+
+# Create the map object & add circle marker
+leaflet(data=quakes1) %>% 
+  addProviderTiles("Esri.WorldImagery") %>% 
+  addMarkers(lng=151.209900, lat=-33.865143, popup = "Sydney, Australia") %>% 
+  addCircleMarkers(lng = ~ long, 
+                   lat= ~ lat, 
+                   color = ~ pal(magrange), #use the pallete
+                   label = paste("Magnitude=", quakes1$mag, "Type=", quakes1$magrange)
+
+                   )
+```
+
